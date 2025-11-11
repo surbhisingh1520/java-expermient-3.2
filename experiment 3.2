@@ -1,0 +1,74 @@
+javac -cp ".:mysql-connector-j-9.5.0.jar" SimpleJDBCExample.java
+java -cp ".:mysql-connector-j-9.5.0.jar" SimpleJDBCExample
+
+import java.sql.*;
+
+public class SimpleJDBCExample {
+    public static void main(String[] args) {
+        // ✅ Your MySQL connection details
+        String url = "jdbc:mysql://bytexldb.com:5051/db_443nsrv89";
+        String user = "user_443nsrv89";
+        String password = "p443nsrv89";
+
+        try {
+            // ⿡ Load MySQL JDBC Driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // ⿢ Connect to MySQL
+            Connection conn = DriverManager.getConnection(url, user, password);
+            System.out.println("✅ Connected to MySQL database!");
+
+            // ⿣ Create table (if not already created)
+            String createTable = """
+                CREATE TABLE IF NOT EXISTS students (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(100),
+                    age INT
+                )
+                """;
+            conn.createStatement().execute(createTable);
+            System.out.println("✅ Table 'students' checked/created.");
+
+            // ⿤ Insert a record
+            String insertSQL = "INSERT INTO students (name, age) VALUES (?, ?)";
+            PreparedStatement insertStmt = conn.prepareStatement(insertSQL);
+            insertStmt.setString(1, "Dhiraj");
+            insertStmt.setInt(2, 21);
+            insertStmt.executeUpdate();
+            System.out.println("✅ Record inserted successfully.");
+
+            // ⿥ Read all records
+            System.out.println("\n📘 Current Records:");
+            ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM students");
+            while (rs.next()) {
+                System.out.println(
+                    rs.getInt("id") + " | " +
+                    rs.getString("name") + " | " +
+                    rs.getInt("age")
+                );
+            }
+
+            // ⿦ Update record
+            String updateSQL = "UPDATE students SET age = ? WHERE name = ?";
+            PreparedStatement updateStmt = conn.prepareStatement(updateSQL);
+            updateStmt.setInt(1, 22);
+            updateStmt.setString(2, "Dhiraj");
+            updateStmt.executeUpdate();
+            System.out.println("\n✅ Record updated successfully.");
+
+            // ⿧ Delete record
+            String deleteSQL = "DELETE FROM students WHERE name = ?";
+            PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL);
+            deleteStmt.setString(1, "Abhi");
+            deleteStmt.executeUpdate();
+            System.out.println("✅ Record deleted successfully.");
+
+            // ⿨ Close connection
+            conn.close();
+            System.out.println("\n✅ All done successfully!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
